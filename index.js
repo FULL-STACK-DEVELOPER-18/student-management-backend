@@ -12,20 +12,15 @@ const server = http.createServer(app);
 
 app.disable("x-powered-by");
 
-// connect database
 connectDB();
 
-// middleware
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors({ origin: "*" }));
 
-
 app.use("/api/students", router.studentsRoute);
 
-
 app.use(errorHandler);
-
 
 server.listen(config.port, () => {
   console.log(`Server is running on port http://localhost:${config.port}`);

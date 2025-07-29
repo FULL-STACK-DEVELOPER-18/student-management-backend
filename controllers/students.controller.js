@@ -2,7 +2,6 @@ import { StatusCodes } from "http-status-codes";
 import { apiResponse } from "../helper/apiResponse.js";
 import Student from "../models/students.model.js";
 
-// 1. Create Student
 const createStudent = async (req, res) => {
   try {
     const { name, rollNumber, course, age, std, division } = req.body;
@@ -46,7 +45,6 @@ const createStudent = async (req, res) => {
   }
 };
 
-// 2. Get All Students (with search, sort, pagination)
 const getStudentsList = async (req, res) => {
   try {
     const { search, sortBy = "name", order = "asc", page = 1, limit = 10, course } = req.query;
@@ -66,12 +64,10 @@ const getStudentsList = async (req, res) => {
     const allowedSortFields = ["name", "rollNumber"];
     const sortField = allowedSortFields.includes(sortBy) ? sortBy : "name";
 
-    // Aggregation pipeline for proper sorting and filtering
     const pipeline = [
       { $match: query },
     ];
 
-    // For rollNumber, sort as number
     if (sortField === "rollNumber") {
       pipeline.push({
         $addFields: {
@@ -87,13 +83,11 @@ const getStudentsList = async (req, res) => {
       });
     }
 
-    // Pagination
     pipeline.push(
       { $skip: (parseInt(page) - 1) * parseInt(limit) },
       { $limit: parseInt(limit) }
     );
 
-    // Get total count for pagination
     const total = await Student.countDocuments(query);
     const students = await Student.aggregate(pipeline);
 
@@ -119,7 +113,6 @@ const getStudentsList = async (req, res) => {
   }
 };
 
-// 3. Get Student by ID
 const getStudentById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -151,7 +144,6 @@ const getStudentById = async (req, res) => {
   }
 };
 
-// 4. Update Student by ID
 const updateStudent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -167,7 +159,6 @@ const updateStudent = async (req, res) => {
       });
     }
 
-    // Check for duplicate rollNumber if it's being changed
     if (rollNumber && rollNumber !== student.rollNumber) {
       const duplicate = await Student.findOne({ rollNumber });
       if (duplicate) {
@@ -206,7 +197,6 @@ const updateStudent = async (req, res) => {
   }
 };
 
-// 5. Delete Student by ID
 const deleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
